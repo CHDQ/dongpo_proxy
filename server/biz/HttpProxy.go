@@ -6,42 +6,63 @@ import (
 	"io"
 	"log"
 	"net"
-	"net/url"
-	"strings"
 )
 
-func startServer() {
-
+type Conn struct {
+	method, host, httpVersion string
+	client                    net.Conn
+	server                    net.Conn
 }
 
-func DoRequest(buffer []byte, client net.Conn) {
-	var method, host string
-	fmt.Sscanf(string(buffer[:bytes.IndexByte(buffer[:], '\n')]), "%s%s", &method, &host)
-	hostPortURL, err := url.Parse(host)
+func StartServer(ip string, port string) {
+	listen, err := net.Listen("tcp", ip+":"+port)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Server start error!!!\n", err)
 		return
 	}
-	var address string
-	if hostPortURL.Opaque == "443" { //https请求
-		address = hostPortURL.Scheme + ":443"
-	} else {                                            //http请求
-		if strings.Index(hostPortURL.Host, ":") == -1 { //host不带端口， 默认80
-			address = hostPortURL.Host + ":80"
-		} else {
-			address = hostPortURL.Host
+	log.Print("Server has started. Listening "+"address : ", ip+":"+port+"	...")
+	for {
+		connect, err := listen.Accept()
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println("access connect [" + connect.RemoteAddr().String() + "]")
+		go handleRequest(connect)
+	}
+}
+
+func handleRequest(connect net.Conn) {
+	if connect == nil {
+		return
+	}
+	var buffer [1024]byte
+	num, err := connect.Read(buffer[:])
+	if err != nil {
+		log.Fatal(err)
+	}
+	var con *Conn
+	var method, host, httpVersion string
+	fmt.Sscanf(string(buffer[:bytes.IndexByte(buffer[:num], '\n')]), "%s%s%s", &method, &host, &httpVersion)
+	server, errors := net.Dial("tcp", host)
+	if errors != nil {
+		log.Fatal(errors)
+		return
+	}
+	con = &Conn{
+		method:      method,
+		host:        host,
+		httpVersion: httpVersion,
+		client:      connect,
+		server:      server,
+	}
+	if method == "CONNECT" { //处理开启隧道请求
+		_, err := connect.Write([]byte("HTTP/1.1 200 Connection established\r\n\r\n"))
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
-	fmt.Print(string(buffer[:]))
-	server, err := net.Dial("tcp", address)
-	if err != nil {
-		log.Fatal(err)
-		return
+	if con != nil {
+		go io.Copy(con.client, con.server)
+		io.Copy(con.server, con.client)
 	}
-	server.Write(buffer[:])
-	client.Write([]byte("HTTP/1.0 200 Connection Established\r\n\r\n"))
-
-	// 直通双向复制
-	go io.Copy(server, client)
-	go io.Copy(client, server)
 }

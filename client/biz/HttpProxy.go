@@ -1,7 +1,6 @@
 package biz
 
 import (
-	"bytes"
 	"fmt"
 	"log"
 	"net"
@@ -36,19 +35,17 @@ func handleRequest(connect net.Conn) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	var method, host, httpVersion string
-	fmt.Sscanf(string(buffer[:bytes.IndexByte(buffer[:], '\n')]), "%s%s%s", &method, &host, &httpVersion)
-	if method == "CONNECT" { //处理请求
-		num, err := connect.Write([]byte("HTTP/1.1 200 Connection established\r\n\r\n"))
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Println(num)
+	server, err := net.Dial("tcp", "192.168.192.132:8080")
+	if err != nil {
+ 		log.Fatal(err)
 	}
-	for {
-		num, _ := connect.Read(buffer[:])
-		fmt.Println(num)
+	server.Write(buffer[:])
+	go func() {
 		fmt.Println(string(buffer[:]))
-	}
-	//biz.DoRequest(buffer[:num], connect)
+		server.Read(buffer[:])
+		connect.Write(buffer[:])
+		fmt.Println(string(buffer[:]))
+	}()
+	defer server.Close()
+	defer connect.Close()
 }
