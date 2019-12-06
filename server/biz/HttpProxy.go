@@ -2,6 +2,7 @@ package biz
 
 import (
 	"bytes"
+	"dongpo_proxy/proxy"
 	"fmt"
 	"io"
 	"log"
@@ -14,21 +15,10 @@ type Conn struct {
 	server                    net.Conn
 }
 
-func StartServer(ip string, port string) {
-	listen, err := net.Listen("tcp", ip+":"+port)
-	if err != nil {
-		log.Fatal("Server start error!!!\n", err)
-		return
-	}
-	log.Print("Server has started. Listening "+"address : ", ip+":"+port+"	...")
-	for {
-		connect, err := listen.Accept()
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Println("access connect [" + connect.RemoteAddr().String() + "]")
-		go handleRequest(connect)
-	}
+func StartServer(listenerAddr string) {
+	serverController := &ServerController{}
+	serverController.InitParam(proxy.Http, listenerAddr, "XOR")
+	serverController.StartListen()
 }
 
 func handleRequest(connect net.Conn) {

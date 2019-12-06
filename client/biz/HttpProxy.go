@@ -10,13 +10,11 @@ import (
  * 开启客户端监听
  */
 func StartClient(listenerAddr string, rpcServerAddr string) {
-	listener, err := net.ResolveTCPAddr("tcp", listenerAddr)
+	rpcServer, err := net.ResolveTCPAddr("tcp", rpcServerAddr)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	rpcServer, err := net.ResolveTCPAddr("tcp", rpcServerAddr)
-	xor := proxy.Xor{}
-	conn := &proxy.Controller{Method: proxy.Http, Listener: listener, RpcConnector: rpcServer, XEncryption: xor}
-	clientHandler := &ClientHandler{controller: *conn}
-	conn.StartListen(clientHandler)
+	clientController := &ClientController{RpcConnector: rpcServer}
+	clientController.InitParam(proxy.Http, listenerAddr, "XOR")
+	clientController.StartListen()
 }
