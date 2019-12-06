@@ -1,4 +1,4 @@
-package biz
+package http
 
 import (
 	"dongpo_proxy/proxy"
@@ -12,13 +12,13 @@ type ClientController struct {
 }
 
 func (clientController *ClientController) Handle(conn net.Conn) {
-	defer conn.Close()
+	//defer conn.Close()
 	rpcServer, err := clientController.DialRpcServer(clientController.RpcConnector)
-	defer rpcServer.Close()
 	if err != nil {
 		log.Println(err)
 		return
 	}
+	//defer rpcServer.Close()
 	go func() {
 		clientController.DecodeCopy(rpcServer, conn)
 	}()

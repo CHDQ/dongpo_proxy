@@ -17,11 +17,10 @@ const (
 代理管理
 */
 type Controller struct {
-	Method   Method       //http or socks5
-	Listener *net.TCPAddr //本地监听
-
+	Method      Method       //http or socks5
+	Listener    *net.TCPAddr //本地监听
 	XEncryption Encryption
-	Handler
+	Handler     Handler
 }
 
 /**
@@ -56,7 +55,7 @@ func (proxy *Controller) StartListen() {
 		}
 		// localConn被关闭时直接清除所有数据 不管没有发送的数据
 		localConn.SetLinger(0)
-		go proxy.Handle(localConn)
+		go proxy.Handler.Handle(localConn)
 	}
 }
 func (proxy *Controller) DialRpcServer(rpcServer *net.TCPAddr) (*net.TCPConn, error) {
@@ -84,9 +83,9 @@ func (proxy *Controller) copy(in net.Conn, out net.Conn, handle func(data []byte
 				return err
 			}
 		}
-		readCount, data := handle(buffer[:])
+		readCount, data := handle(buffer[:readCount])
 		if readCount > 0 {
-			writeCount, err := out.Write(data[:])
+			writeCount, err := out.Write(data[:readCount])
 			if err != nil {
 				return err
 			}
@@ -96,14 +95,14 @@ func (proxy *Controller) copy(in net.Conn, out net.Conn, handle func(data []byte
 		}
 	}
 }
-func (proxy *Controller) InitParam(method Method, listenerAddr string, XEncryption string) {
+func (proxy *Controller) InitParam(method Method, listenerAddr string, XEncryption string, handler Handler) {
 	listener, err := net.ResolveTCPAddr("tcp", listenerAddr)
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	proxy.Method = method
 	proxy.Listener = listener
+	proxy.Handler = handler
 	switch XEncryption {
 	case "Xor":
 		proxy.XEncryption = &Xor{}

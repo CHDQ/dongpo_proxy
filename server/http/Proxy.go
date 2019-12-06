@@ -1,4 +1,4 @@
-package biz
+package http
 
 import (
 	"bytes"
@@ -17,7 +17,7 @@ type Conn struct {
 
 func StartServer(listenerAddr string) {
 	serverController := &ServerController{}
-	serverController.InitParam(proxy.Http, listenerAddr, "XOR")
+	serverController.InitParam(proxy.Http, listenerAddr, "XOR", serverController)
 	serverController.StartListen()
 }
 
@@ -33,7 +33,7 @@ func handleRequest(connect net.Conn) {
 	var con *Conn
 	var method, host, httpVersion string
 	fmt.Sscanf(string(buffer[:bytes.IndexByte(buffer[:num], '\n')]), "%s%s%s", &method, &host, &httpVersion)
-	server, errors := net.Dial("tcp", host)
+	server, errors := net.Dial("tcp", "www.baidu.com:443")
 	if errors != nil {
 		log.Fatal(errors)
 		return

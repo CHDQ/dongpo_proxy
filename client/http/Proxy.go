@@ -1,4 +1,4 @@
-package biz
+package http
 
 import (
 	"dongpo_proxy/proxy"
@@ -15,6 +15,6 @@ func StartClient(listenerAddr string, rpcServerAddr string) {
 		log.Fatalln(err)
 	}
 	clientController := &ClientController{RpcConnector: rpcServer}
-	clientController.InitParam(proxy.Http, listenerAddr, "XOR")
+	clientController.InitParam(proxy.Http, listenerAddr, "XOR", clientController)
 	clientController.StartListen()
 }
