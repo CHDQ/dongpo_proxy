@@ -19,10 +19,11 @@ func (serverController *ServerController) Handle(conn net.Conn) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if num > 0 && bytes.IndexByte(buffer[:num], '\n') > 0 {
-		log.Println(string(buffer[:num]))
+	num, data := serverController.XEncryption.Decode(buffer[:])
+	if num > 0 && bytes.IndexByte(data[:num], '\n') > 0 {
+		log.Println(string(data[:num]))
 		var method, host, httpVersion string
-		fmt.Sscanf(string(buffer[:bytes.IndexByte(buffer[:num], '\n')]), "%s%s%s", &method, &host, &httpVersion)
+		fmt.Sscanf(string(data[:bytes.IndexByte(data[:num], '\n')]), "%s%s%s", &method, &host, &httpVersion)
 		rpcServer, errors := net.Dial("tcp", host)
 		if errors != nil {
 			log.Println(errors)
