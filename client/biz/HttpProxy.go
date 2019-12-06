@@ -1,7 +1,7 @@
 package biz
 
 import (
-	"fmt"
+	"dongpo_proxy/proxy"
 	"log"
 	"net"
 )
@@ -9,43 +9,14 @@ import (
 /**
  * 开启客户端监听
  */
-func StartClient(ip string, port string) {
-	listen, err := net.Listen("tcp", ip+":"+port)
+func StartClient(listenerAddr string, rpcServerAddr string) {
+	listener, err := net.ResolveTCPAddr("tcp", listenerAddr)
 	if err != nil {
-		log.Fatal("client start error!!!\n", err)
-		return
+		log.Fatalln(err)
 	}
-	log.Print("Client has started. Listening "+"address : ", ip+":"+port+"	...")
-	for {
-		connect, err := listen.Accept()
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Println("access connect [" + connect.RemoteAddr().String() + "]")
-		go handleRequest(connect)
-	}
-}
-
-func handleRequest(connect net.Conn) {
-	if connect == nil {
-		return
-	}
-	var buffer [1024]byte
-	_, err := connect.Read(buffer[:])
-	if err != nil {
-		log.Fatal(err)
-	}
-	server, err := net.Dial("tcp", "192.168.192.132:8080")
-	if err != nil {
- 		log.Fatal(err)
-	}
-	server.Write(buffer[:])
-	go func() {
-		fmt.Println(string(buffer[:]))
-		server.Read(buffer[:])
-		connect.Write(buffer[:])
-		fmt.Println(string(buffer[:]))
-	}()
-	defer server.Close()
-	defer connect.Close()
+	rpcServer, err := net.ResolveTCPAddr("tcp", rpcServerAddr)
+	xor := proxy.Xor{}
+	conn := &proxy.Controller{Method: proxy.Http, Listener: listener, RpcConnector: rpcServer, XEncryption: xor}
+	clientHandler := &ClientHandler{controller: *conn}
+	conn.StartListen(clientHandler)
 }
