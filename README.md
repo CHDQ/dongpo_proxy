@@ -16,3 +16,21 @@
 
 ```
 # 用于网络代理转发
+
+## client端
+### 编译
+  1. `cd ${your_path}/donpo_proxy/client`
+  2. `go build Client.go` 生成`Client.exe`，双击即可运行
+### 配置
+  1. gui配置，根据提示输入
+  2. 文件配置
+    _ 在`Client.exe`同级目录下,新建`config.json`文件,内容如下
+    
+    ```javascript
+        {
+          "local.port": "8100",
+          "rpc.ip": "167.179.102.249",
+          "rpc.port": "8080"
+        }
+     ```
+     
