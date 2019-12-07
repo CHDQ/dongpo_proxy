@@ -7,6 +7,7 @@ import (
 	_ "github.com/andlabs/ui/winmanifest"
 	"io/ioutil"
 	"net"
+	"os"
 	"strconv"
 	"time"
 )
@@ -40,6 +41,17 @@ func (uiManager *UIManager) initParam() {
 		uiManager.RPCPort.SetText(dict["rpc.port"])
 	}
 
+}
+
+func (uiManager *UIManager) storeConfig(localPort string, rpcIp string, rpcPort string) {
+	dict := make(map[string]string)
+	dict["local.port"] = localPort
+	dict["rpc.ip"] = rpcIp
+	dict["rpc.port"] = rpcPort
+	data, err := json.Marshal(dict)
+	if err == nil {
+		ioutil.WriteFile("./config.json", data, os.ModeAppend)
+	}
 }
 func (uiManager *UIManager) CreatePanel() {
 	err := ui.Main(func() {
@@ -110,6 +122,7 @@ func (uiManager *UIManager) commitButtonClick(button *ui.Button) {
 		button.Disable()
 		uiManager.CancelBtn.Enable()
 		uiManager.Info.SetText("start proxy client at " + time.Now().Format("2006-01-02 15:04:05"))
+		uiManager.storeConfig(localPort, rpcIp, rpcPort)
 		go func() {
 			err := http.StartClient(":"+localPort, rpcIp+":"+rpcPort)
 			if err != nil {
