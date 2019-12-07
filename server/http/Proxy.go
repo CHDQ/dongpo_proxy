@@ -28,14 +28,15 @@ func handleRequest(connect net.Conn) {
 	var buffer [1024]byte
 	num, err := connect.Read(buffer[:])
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 	var con *Conn
 	var method, host, httpVersion string
 	fmt.Sscanf(string(buffer[:bytes.IndexByte(buffer[:num], '\n')]), "%s%s%s", &method, &host, &httpVersion)
 	server, errors := net.Dial("tcp", "www.baidu.com:443")
 	if errors != nil {
-		log.Fatal(errors)
+		log.Println(errors)
 		return
 	}
 	con = &Conn{
@@ -48,7 +49,8 @@ func handleRequest(connect net.Conn) {
 	if method == "CONNECT" { //处理开启隧道请求
 		_, err := connect.Write([]byte("HTTP/1.1 200 Connection established\r\n\r\n"))
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
+			return
 		}
 	}
 	if con != nil {

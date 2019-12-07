@@ -17,10 +17,12 @@ const (
 代理管理
 */
 type Controller struct {
-	Method      Method       //http or socks5
-	Listener    *net.TCPAddr //本地监听
+	Method      Method           //http or socks5
+	Listener    *net.TCPAddr     //本地监听地址
+	MyListener  *net.TCPListener //本地监听
 	XEncryption Encryption
 	Handler     Handler
+	IsStop      bool
 }
 
 /**
@@ -41,22 +43,32 @@ type Handler interface {
 /**
 开启监听
 */
-func (proxy *Controller) StartListen() {
+func (proxy *Controller) StartListen() error {
 	listener, err := net.ListenTCP("tcp", proxy.Listener)
 	if err != nil {
-		log.Println(err)
+		return err
 	}
 	defer listener.Close()
+	proxy.MyListener = listener
 	for {
 		localConn, err := listener.AcceptTCP()
 		if err != nil {
+			if proxy.IsStop {
+				return nil
+			}
 			log.Println(err)
 			continue
 		}
 		// localConn被关闭时直接清除所有数据 不管没有发送的数据
-		localConn.SetLinger(0)
+		_ = localConn.SetLinger(0)
 		go proxy.Handler.Handle(localConn)
 	}
+}
+func (proxy *Controller) ShutdownListener() error {
+	if proxy.MyListener == nil {
+		return nil
+	}
+	return proxy.MyListener.Close()
 }
 func (proxy *Controller) DialRpcServer(rpcServer *net.TCPAddr) (*net.TCPConn, error) {
 	remoteConn, err := net.DialTCP("tcp", nil, rpcServer)
@@ -82,6 +94,7 @@ func (proxy *Controller) copy(in net.Conn, out net.Conn, handle func(data []byte
 			if err != io.EOF {
 				return err
 			}
+			return nil
 		}
 		readCount, data := handle(buffer[:readCount])
 		if readCount > 0 {
@@ -103,6 +116,7 @@ func (proxy *Controller) InitParam(method Method, listenerAddr string, XEncrypti
 	proxy.Method = method
 	proxy.Listener = listener
 	proxy.Handler = handler
+	proxy.IsStop = false
 	switch XEncryption {
 	case "Xor":
 		proxy.XEncryption = &Xor{}

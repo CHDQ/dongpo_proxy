@@ -12,13 +12,13 @@ type ClientController struct {
 }
 
 func (clientController *ClientController) Handle(conn net.Conn) {
-	//defer conn.Close()
+	defer conn.Close()
 	rpcServer, err := clientController.DialRpcServer(clientController.RpcConnector)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	//defer rpcServer.Close()
+	defer rpcServer.Close()
 	go func() {
 		clientController.DecodeCopy(rpcServer, conn)
 	}()

@@ -17,7 +17,8 @@ func (serverController *ServerController) Handle(conn net.Conn) {
 	var buffer [1024]byte
 	num, err := conn.Read(buffer[:])
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 	num, data := serverController.XEncryption.Decode(buffer[:])
 	if num > 0 && bytes.IndexByte(data[:num], '\n') > 0 {
