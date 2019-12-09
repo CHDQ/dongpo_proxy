@@ -1,3 +1,4 @@
+//go:generate goversioninfo -icon=client.ico
 package main
 
 import (

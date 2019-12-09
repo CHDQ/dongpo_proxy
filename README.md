@@ -23,7 +23,7 @@
 ## client端
 ### 编译
   1. `cd ${your_path}/donpo_proxy/client`
-  2. `go build Client.go` 生成`Client.exe`，双击即可运行
+  2. `go build  -ldflags="-H windowsgui"` 生成`Client.exe`，双击即可运行
 ### 配置
   + gui配置，根据提示输入
   + 文件配置
