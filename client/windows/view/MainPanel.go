@@ -4,7 +4,6 @@ import (
 	"dongpo_proxy/client/proxy/http"
 	"encoding/json"
 	"github.com/andlabs/ui"
-	_ "github.com/andlabs/ui/winmanifest"
 	"io/ioutil"
 	"net"
 	"os"

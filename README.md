@@ -31,6 +31,7 @@
 3. 配置环境变量`%msys2_path%/mingw64/bin`
 ## client端
 ### 编译
+  0. 添加图标`rsrc -manifest main.exe.manifest -ico client.ico -o main_amd64.syso  -arch amd64`
   1. `cd ${your_path}/donpo_proxy/client`
   2. `go build  -ldflags="-H windowsgui"` 生成`Client.exe`，双击即可运行
 ### 配置
