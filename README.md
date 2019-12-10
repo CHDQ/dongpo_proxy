@@ -20,6 +20,15 @@
 ##教程环境:
 1. 客户端Windows x64
 2. 服务端CentOs 8 x64
+
+## 开发环境准备
+1. 安装[MSYS2](http://www.msys2.org/)
+2.  `MSYS2` shell中安装gcc
+> `pacman -S mingw-w64-i686-toolchain`
+>
+> `pacman -S mingw-w64-x86_64-toolchain`
+>
+3. 配置环境变量`%msys2_path%/mingw64/bin`
 ## client端
 ### 编译
   1. `cd ${your_path}/donpo_proxy/client`
