@@ -1,6 +1,7 @@
 package view
 
 import (
+	"dongpo_proxy/client/auto_proxy/windows"
 	"dongpo_proxy/client/proxy/http"
 	"encoding/json"
 	"github.com/andlabs/ui"
@@ -120,8 +121,15 @@ func (uiManager *UIManager) commitButtonClick(button *ui.Button) {
 	if rpcPortNum >= 1024 && rpcPortNum <= 65535 {
 		button.Disable()
 		uiManager.CancelBtn.Enable()
-		uiManager.Info.SetText("start proxy client at " + time.Now().Format("2006-01-02 15:04:05"))
+		startInfo := "start proxy client at " + time.Now().Format("2006-01-02 15:04:05")
 		uiManager.storeConfig(localPort, rpcIp, rpcPort)
+		err := windows.SetProxy("127.0.0.1:"+localPort, "")
+		if err != nil {
+			startInfo += "\nAuto proxy fail !\nPlease set it manually !"
+		} else {
+			startInfo += "\nAuto proxy success !\nEnjoy !"
+		}
+		uiManager.Info.SetText(startInfo)
 		go func() {
 			err := http.StartClient(":"+localPort, rpcIp+":"+rpcPort)
 			if err != nil {
@@ -136,6 +144,7 @@ func (uiManager *UIManager) commitButtonClick(button *ui.Button) {
 	uiManager.Info.SetText("代理服务器端口格式错误")
 }
 func (uiManager *UIManager) cancelButtonClick(button *ui.Button) {
+	windows.CloseProxy()
 	http.ShutdownClient()
 	uiManager.Info.SetText("stop proxy client at " + time.Now().Format("2006-01-02 15:04:05"))
 	button.Disable()
