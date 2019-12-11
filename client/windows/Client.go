@@ -8,9 +8,9 @@ import (
 )
 
 func main() {
-	manager := view.UIManager{}
-	go manager.CreatePanel()
 	c := make(chan os.Signal)
+	manager := view.UIManager{SignalChannel: c}
+	go manager.CreatePanel()
 	//监听指定信号 ctrl+c kill
 	signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
 	_ = <-c

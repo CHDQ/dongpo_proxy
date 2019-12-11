@@ -1,7 +1,7 @@
 package view
 
 import (
-	"dongpo_proxy/client/auto_proxy/windows"
+	autoproxy "dongpo_proxy/client/auto_proxy/windows"
 	"dongpo_proxy/client/proxy/http"
 	"encoding/json"
 	"github.com/andlabs/ui"
@@ -9,20 +9,24 @@ import (
 	"net"
 	"os"
 	"strconv"
+	"syscall"
 	"time"
 )
 
+const ConfigPath = "./dongpo.json" //配置文件路径
+
 type UIManager struct {
-	LocalPort *ui.Entry
-	RPCIp     *ui.Entry
-	RPCPort   *ui.Entry
-	Info      *ui.Label
-	CommitBtn *ui.Button
-	CancelBtn *ui.Button
+	SignalChannel chan<- os.Signal
+	LocalPort     *ui.Entry
+	RPCIp         *ui.Entry
+	RPCPort       *ui.Entry
+	Info          *ui.Label
+	CommitBtn     *ui.Button
+	CancelBtn     *ui.Button
 }
 
 func (uiManager *UIManager) initParam() {
-	data, err := ioutil.ReadFile("./config.json")
+	data, err := ioutil.ReadFile(ConfigPath)
 	if err != nil {
 		return
 	}
@@ -50,7 +54,7 @@ func (uiManager *UIManager) storeConfig(localPort string, rpcIp string, rpcPort 
 	dict["rpc.port"] = rpcPort
 	data, err := json.Marshal(dict)
 	if err == nil {
-		ioutil.WriteFile("./config.json", data, os.ModeAppend)
+		ioutil.WriteFile(ConfigPath, data, os.ModeAppend)
 	}
 }
 func (uiManager *UIManager) CreatePanel() {
@@ -119,7 +123,7 @@ func (uiManager *UIManager) commitButtonClick(button *ui.Button) {
 		uiManager.CancelBtn.Enable()
 		startInfo := "start proxy client at " + time.Now().Format("2006-01-02 15:04:05")
 		uiManager.storeConfig(localPort, rpcIp, rpcPort)
-		err := windows.SetProxy("127.0.0.1:"+localPort, "")
+		err := autoproxy.SetProxy("127.0.0.1:"+localPort, "")
 		if err != nil {
 			startInfo += "\nAuto proxy fail !\nPlease set it manually !"
 		} else {
@@ -140,20 +144,18 @@ func (uiManager *UIManager) commitButtonClick(button *ui.Button) {
 	uiManager.Info.SetText("代理服务器端口格式错误")
 }
 func (uiManager *UIManager) cancelButtonClick(button *ui.Button) {
-	windows.CloseProxy()
-	http.ShutdownClient()
+	ShutdownCallback()
 	uiManager.Info.SetText("stop proxy client at " + time.Now().Format("2006-01-02 15:04:05"))
 	button.Disable()
 	uiManager.CommitBtn.Enable()
 }
 func (uiManager *UIManager) closePanel(window *ui.Window) bool {
-	windows.CloseProxy()
-	http.ShutdownClient()
 	ui.Quit()
+	uiManager.SignalChannel <- syscall.SIGTERM
 	return true
 }
 
 func ShutdownCallback() {
-	windows.CloseProxy()
+	autoproxy.CloseProxy()
 	http.ShutdownClient()
 }

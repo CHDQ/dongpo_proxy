@@ -24,6 +24,14 @@
 ## 开发环境准备
 1. 安装[MSYS2](http://www.msys2.org/)
 2.  `MSYS2` shell中安装gcc
+>更新`MSYS2`
+> 
+>`pacman -Sy pacman`
+>
+> `pacman -Syu`
+>
+> `pacman -Su`
+>
 > `pacman -S mingw-w64-i686-toolchain`
 >
 > `pacman -S mingw-w64-x86_64-toolchain`
@@ -33,7 +41,7 @@
 ### 编译
   0. 添加图标`rsrc -manifest main.exe.manifest -ico client.ico -o main_amd64.syso  -arch amd64`
   1. `cd ${your_path}/donpo_proxy/client`
-  2. `go build  -ldflags="-H windowsgui"` 生成`Client.exe`，双击即可运行
+  2. `go build  -ldflags="-H windowsgui" -o dongpo_client.exe` 生成`Client.exe`，双击即可运行
 ### 配置
   + gui配置，根据提示输入
   + 文件配置
