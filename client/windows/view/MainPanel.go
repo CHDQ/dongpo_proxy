@@ -85,11 +85,7 @@ func (uiManager *UIManager) CreatePanel() {
 		window.SetChild(box)
 
 		// 设置：窗口关闭时
-		window.OnClosing(func(*ui.Window) bool {
-			// 窗体关闭
-			ui.Quit()
-			return true
-		})
+		window.OnClosing(uiManager.closePanel)
 		uiManager.initParam()
 		// 窗体显示
 		window.Show()
@@ -149,4 +145,15 @@ func (uiManager *UIManager) cancelButtonClick(button *ui.Button) {
 	uiManager.Info.SetText("stop proxy client at " + time.Now().Format("2006-01-02 15:04:05"))
 	button.Disable()
 	uiManager.CommitBtn.Enable()
+}
+func (uiManager *UIManager) closePanel(window *ui.Window) bool {
+	windows.CloseProxy()
+	http.ShutdownClient()
+	ui.Quit()
+	return true
+}
+
+func ShutdownCallback() {
+	windows.CloseProxy()
+	http.ShutdownClient()
 }
