@@ -41,11 +41,11 @@
 ### 编译
   0. 添加图标`rsrc -manifest main.exe.manifest -ico client.ico -o main_amd64.syso  -arch amd64`
   1. `cd ${your_path}/donpo_proxy/client`
-  2. `go build  -ldflags="-H windowsgui" -o dongpo_client.exe` 生成`Client.exe`，双击即可运行
+  2. `go build  -ldflags="-H windowsgui" -o dongpo_client.exe` 生成`dongpo_client.exe`，双击即可运行
 ### 配置
   + gui配置，根据提示输入
   + 文件配置
-    + 在`Client.exe`同级目录下,新建`config.json`文件（内容如下）,启动Client.exe
+    + 在`dongpo_client.exe`同级目录下,新建`dongpo.json`文件（内容如下）,dongpo_client.exe
     
     
 ```json
