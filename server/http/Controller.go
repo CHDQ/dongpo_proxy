@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/url"
+	"strings"
 )
 
 type ServerController struct {
@@ -25,7 +27,22 @@ func (serverController *ServerController) Handle(conn net.Conn) {
 		log.Println(string(data[:num]))
 		var method, host, httpVersion string
 		fmt.Sscanf(string(data[:bytes.IndexByte(data[:num], '\n')]), "%s%s%s", &method, &host, &httpVersion)
-		rpcServer, errors := net.Dial("tcp", host)
+		hostPortURL, err := url.Parse(host)
+		var address string
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		if hostPortURL.Opaque == "443" { //https访问
+			address = hostPortURL.Scheme + ":443"
+		} else {                                            //http访问
+			if strings.Index(hostPortURL.Host, ":") == -1 { //host不带端口， 默认80
+				address = hostPortURL.Host + ":80"
+			} else {
+				address = hostPortURL.Host
+			}
+		}
+		rpcServer, errors := net.Dial("tcp", address)
 		if errors != nil {
 			log.Println(errors)
 			return
@@ -45,7 +62,7 @@ func (serverController *ServerController) Handle(conn net.Conn) {
 				log.Println(err)
 			}
 		}()
-		err := serverController.EncodeCopy(conn, rpcServer)
+		err = serverController.EncodeCopy(conn, rpcServer)
 		if err != nil {
 			log.Println(err)
 		}
