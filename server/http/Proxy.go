@@ -34,7 +34,7 @@ func handleRequest(connect net.Conn) {
 	var con *Conn
 	var method, host, httpVersion string
 	fmt.Sscanf(string(buffer[:bytes.IndexByte(buffer[:num], '\n')]), "%s%s%s", &method, &host, &httpVersion)
-	server, errors := net.Dial("tcp", "www.baidu.com:443")
+	server, errors := net.Dial("tcp", host)
 	if errors != nil {
 		log.Println(errors)
 		return
