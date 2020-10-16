@@ -62,6 +62,12 @@
  |rpc.ip  |  string  |   代理服务器ip  |
  |rpc.port |  string  |   代理服务器端口  |
 
+
+### 启动pac代理
+client没有开发pac功能，可以手动设置pac，以windows为例，vpn->代理->脚本地址 填写代理pac文件路径即可。
+
+可用代理路径`https://raw.githubusercontent.com/petronny/gfwlist2pac/master/gfwlist.pac`
+
 ## Server端
   1. `cd ${your_path}/donpo_proxy/server`
   2. `go build Server.go` 生成`Server`，linux中运行./Server
