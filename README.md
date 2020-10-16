@@ -38,12 +38,7 @@
 >
 
 3. 配置环境变量`%msys2_path%/mingw64/bin`
-4. 安装rsrc
-> `go get github.com/akavel/rsrc`
->
-> `cd %GOPATH%/src/github.com/akavel/rsrc`
->
-> `go build`
+4. 安装go依赖包,参照`go.mod`文件内容中的依赖项
 ## client端
 ### 编译
   1. `cd ${your_path}/donpo_proxy/client/windows/view`
@@ -79,3 +74,4 @@ client会自动设置本地pac，可以手动关闭。以windows为例，vpn->�
 ## Server端
   1. `cd ${your_path}/donpo_proxy/server`
   2. `go build Server.go` 生成`Server`，linux中运行./Server
+  > 默认启动`8080`端口,需要修改端口，可以更改`Server.go`
