@@ -123,7 +123,7 @@ func (uiManager *UIManager) commitButtonClick(button *ui.Button) {
 		uiManager.CancelBtn.Enable()
 		startInfo := "start proxy client at " + time.Now().Format("2006-01-02 15:04:05")
 		uiManager.storeConfig(localPort, rpcIp, rpcPort)
-		err := windows.SetProxy("127.0.0.1:"+localPort, "")
+		err := windows.SetProxy("127.0.0.1:"+localPort, "https://raw.githubusercontent.com/petronny/gfwlist2pac/master/gfwlist.pac")
 		if err != nil {
 			startInfo += "\nAuto proxy fail !\nPlease set it manually !"
 		} else {
