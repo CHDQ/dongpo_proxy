@@ -1,5 +1,5 @@
 # dongpo_proxy
-![image](https://img.shields.io/badge/golang-1.13.4-green)
+![image](https://img.shields.io/badge/golang-v1.13.4%2B-green)
                                                                                                                           
    ```                                                                                                                       
                                                                                                                           
