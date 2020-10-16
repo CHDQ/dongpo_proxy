@@ -36,12 +36,14 @@
 >
 > `pacman -S mingw-w64-x86_64-toolchain`
 >
+> `go get github.com/akavel/rsrc`
 3. 配置环境变量`%msys2_path%/mingw64/bin`
 ## client端
 ### 编译
-  0. 添加图标`rsrc -manifest main.exe.manifest -ico client.ico -o main_amd64.syso  -arch amd64`
-  1. `cd ${your_path}/donpo_proxy/client`
-  2. `go build  -ldflags="-H windowsgui" -o dongpo_client.exe` 生成`dongpo_client.exe`，双击即可运行
+  1. `cd ${your_path}/donpo_proxy/client/windows/view`
+  2. 添加图标`rsrc -manifest main.exe.manifest -ico client.ico -o main_amd64.syso  -arch amd64`
+  3. `cd ${your_path}/donpo_proxy/client/windows`
+  4. `go build  -ldflags="-H windowsgui" -o dongpo_client.exe` 生成`dongpo_client.exe`，双击即可运行
 ### 配置
   + gui配置，根据提示输入
   + 文件配置
