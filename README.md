@@ -72,7 +72,7 @@
 
 
 ### 启动pac代理
-client没有开发pac功能(后面有时间会做本地pac)，可以手动设置pac，以windows为例，vpn->代理->脚本地址 填写代理pac文件路径即可。
+client会自动设置本地pac，可以手动关闭。以windows为例，vpn->代理->使用设置脚本->关闭
 
 可用代理路径`https://raw.githubusercontent.com/petronny/gfwlist2pac/master/gfwlist.pac`
 
