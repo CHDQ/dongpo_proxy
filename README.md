@@ -36,8 +36,14 @@
 >
 > `pacman -S mingw-w64-x86_64-toolchain`
 >
-> `go get github.com/akavel/rsrc`
+
 3. 配置环境变量`%msys2_path%/mingw64/bin`
+4. 安装rsrc
+> `go get github.com/akavel/rsrc`
+>
+> `cd %GOPATH%/src/github.com/akavel/rsrc`
+>
+> `go build`
 ## client端
 ### 编译
   1. `cd ${your_path}/donpo_proxy/client/windows/view`
